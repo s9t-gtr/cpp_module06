@@ -9,18 +9,19 @@
 class ScalarConverter{
     public:
         static void convert(const std::string input);
-        static void inputCheck(const std::string input);
-    
-        // static char rChar;
-        // static int rInt;
-        // static float rFloat;
-        // static double rDouble;
+    private:
+        static int getConvertCase(std::string input);
+        static void valueCheck(std::string input);
+        static bool isSpecialString(std::string input);
+        static void convert_char(std::string input);
+        static void convert_float(std::string input);
+        static void convert_double(std::string input);
+        static void convert_int(std::string input);
 
     public:
         class InputException: public std::exception{
             public:
-                InputException(){};
-                virtual const std::string exceptionMessage() throw();
+                void allImpossible() throw();
         };
 };
 

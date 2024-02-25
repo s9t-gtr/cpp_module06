@@ -4,7 +4,7 @@ OBJS = ${CPPS:.cpp=.o}
 
 NAME = convert
 CXX = c++
-CXXFLAGS = -Wall -Wextra -Werror -std=c++98
+CXXFLAGS = -Wall -Wextra -Werror -std=c++98 -g3
 %.o: %.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
