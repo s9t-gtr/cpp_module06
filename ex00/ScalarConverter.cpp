@@ -18,6 +18,7 @@ void ScalarConverter::convert(std::string input){
                 break;
         }
     }catch(std::invalid_argument& e){
+        std::cout << e.what() << std::endl;
         allImpossible();
     }
 }
@@ -52,6 +53,8 @@ void ScalarConverter::valueCheck(std::string input){
         }
         if(!std::isdigit(input[i]) && input[i] != 'f')
             throw std::invalid_argument("Not a number or an f at the end.");
+        if(input[i] == 'f' && dotCount != 1)
+            throw std::invalid_argument("invalid float literal");
     }
     
 }
@@ -65,7 +68,7 @@ bool ScalarConverter::isSpecialString(std::string input){
 }
 
 template<typename T>
-void outputChar(T val){
+void ScalarConverter::outputChar(T val){
     if(0 <= val && val <= 128){
         if(std::isprint(static_cast<unsigned char>(val)))
             std::cout << "char: '" << static_cast<char>(val) << "'" << std::endl;
@@ -91,21 +94,13 @@ void ScalarConverter::convert_float(std::string input){
         //convert to char-------------------------------------------------
         outputChar(f);
         //convert to int-------------------------------------------------
-        if(INT_MIN <= f && f <= INT_MAX){
-            std::cout << "int: " << static_cast<int>(f) << std::endl;
-        }else
-            std::cout << "int: impossible" << std::endl;
+        outputInt(f);
         //convert to float-------------------------------------------------
-        if(std::floor(f) == f){
-            if(static_cast<float>(f) == INFINITY)
-                std::cout << "float: +inff" << std::endl;
-            else if(static_cast<float>(f) == -INFINITY)
-                std::cout << "float: -inff" << std::endl;
-            else
-                std::cout << std::fixed << std::setprecision(1) << "float: " << static_cast<float>(f) << "f"<< std::endl;
-        }
+        if(static_cast<float>(f) == INFINITY)
+            std::cout<< std::fixed << std::setprecision(1) <<"float: " << (input[0] == '-' ? "-inff": "+inff")<< std::endl;
         else
             std::cout << std::fixed << std::setprecision(1) << "float: " << static_cast<float>(f) << "f"<< std::endl;
+
         //convert to double-------------------------------------------------
         if(std::floor(f) == f)
             std::cout<< std::fixed << std::setprecision(1) << "double: " << (f)  << std::endl;
@@ -127,18 +122,13 @@ void ScalarConverter::convert_double(std::string input){
 
         outputChar(d);
 
-        if(INT_MIN <= d && d <= INT_MAX)
-            std::cout << "int: " << static_cast<int>(d) << std::endl;
-        else
-            std::cout << "int: impossible" << std::endl;
+        outputInt(d);
         
-        if(std::floor(static_cast<float>(d)) == static_cast<float>(d)){
-            if(static_cast<float>(d) == INFINITY)
-                std::cout<< std::fixed << std::setprecision(1) <<"float: " << (input[0] == '-' ? "-inff": "+inff")<< std::endl;
-            else
-                std::cout<< std::fixed << std::setprecision(1) <<"float: " << static_cast<float>(d) << "f"<< std::endl;
-        }else
-            std::cout<< std::fixed << std::setprecision(1)  <<"float: " << static_cast<float>(d) << "f" << std::endl;
+        if(static_cast<float>(d) == INFINITY)
+            std::cout<< std::fixed << std::setprecision(1) <<"float: " << (input[0] == '-' ? "-inff": "+inff")<< std::endl;
+        else
+            std::cout<< std::fixed << std::setprecision(1) <<"float: " << static_cast<float>(d) << "f"<< std::endl;
+
         if(std::floor(d) == d)
             std::cout << "double: " << d << std::endl;
         else
@@ -152,10 +142,10 @@ void ScalarConverter::convert_double(std::string input){
 }
 void ScalarConverter::convert_int(std::string input){
     try{
+        std::cout << "int" << std::endl;
         int i = stoi(input);
-        outputChar(i);
-        
-        std::cout << "int: " << i << std::endl; 
+        outputChar(i); 
+        std::cout << "int: " << i << std::endl;
         std::cout<< std::fixed << std::setprecision(1) << "float: " << static_cast<float>(i) <<"f"<< std::endl; 
         std::cout<< std::fixed << std::setprecision(1) << "double: " << static_cast<double>(i)<< std::endl; 
     }catch(std::out_of_range&){
