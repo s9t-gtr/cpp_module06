@@ -30,7 +30,8 @@ int ScalarConverter::getConvertType(std::string input){
     valueCheck(input);
     if(input != "+inf" && input != "-inf" && input[len - 1] == 'f')
         return FLOAT_CASE;
-    if(input == "+inf" || input == "-inf" || input == "nan" || input.find(".") != std::string::npos || (std::stod(input) > INT_MAX || std::stod(input) < INT_MIN))
+    // if(input == "+inf" || input == "-inf" || input == "nan" || input.find(".") != std::string::npos || (std::stod(input) > INT_MAX || std::stod(input) < INT_MIN))
+    if(input.find(".") != std::string::npos)
         return DOUBLE_CASE;
     return INT_CASE;
 }
@@ -51,7 +52,7 @@ void ScalarConverter::valueCheck(std::string input){
             if(!std::isdigit(input[i]) && input[i] != '.')
                 throw std::invalid_argument("Not a number or a dot");
         }
-        if(!std::isdigit(input[i]) && input[i] != 'f')
+        if(!std::isdigit(input[i]) && input[i] != 'f' && input[i] != '.')
             throw std::invalid_argument("Not a number or an f at the end.");
         if(input[i] == 'f' && dotCount != 1)
             throw std::invalid_argument("invalid float literal");
