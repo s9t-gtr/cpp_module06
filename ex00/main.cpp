@@ -1,7 +1,4 @@
 #include "ScalarConverter.hpp"
-#include <iomanip>
-//float, double fix
-//
 
 int main(int argc, char** argv){
     {   //float literal

@@ -7,6 +7,7 @@
 #include <cctype>
 #include <iomanip>
 #include <bitset>
+#include <math.h>
 
 class ScalarConverter{
     private:

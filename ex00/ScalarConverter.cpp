@@ -84,7 +84,7 @@ void ScalarConverter::convert_char(std::string input){
 void ScalarConverter::convert_float(std::string input){
     try{
         double f = stod(input);
-        if(f == INFINITY || f == -INFINITY)
+        if(f == INFINITY)
             throw std::out_of_range("inf");
         outputChar(f);
         outputInt(f);
@@ -106,10 +106,9 @@ void ScalarConverter::convert_float(std::string input){
 void ScalarConverter::convert_double(std::string input){
     try{
         double d = stod(input);
-        if(d == INFINITY || d == -INFINITY)
+        if(d == INFINITY)
             throw std::out_of_range("inf");
         outputChar(d);
-
         outputInt(d);
         if(static_cast<float>(d) == INFINITY)
             std::cout<< std::fixed << std::setprecision(1) <<"float: " << (input[0] == '-' ? "-inff": "+inff")<< std::endl;
@@ -120,7 +119,7 @@ void ScalarConverter::convert_double(std::string input){
     }catch(std::out_of_range&){
         std::cout << "char: impossible" << std::endl;
         std::cout << "int: impossible" << std::endl;
-        std::cout << "float: " << (input[0] == '-' ? "-inff": "+inff") << std::endl;
+        std::cout << "float: impossible" << std::endl;
         std::cout << "double: " << (input[0] == '-' ? "-inf": "+inf") << std::endl;
     }
 }
