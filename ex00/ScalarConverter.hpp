@@ -7,6 +7,8 @@
 #include <cctype>
 #include <iomanip>
 #include <bitset>
+#include <sstream>
+#include <math.h>
 
 class ScalarConverter{
     private:
@@ -22,8 +24,8 @@ class ScalarConverter{
         template<typename T>
         static void outputInt(T val);
         static int getConvertType(std::string input);
-        static void valueCheck(std::string input);
-        static bool isSpecialString(std::string input);
+        static int valueCheck(std::string input);
+        static bool isNumbers(std::string input);
 
         static void convert_char(std::string input);
         static void convert_float(std::string input);
@@ -36,7 +38,8 @@ class ScalarConverter{
         const static int FLOAT_CASE = 2;
         const static int DOUBLE_CASE = 3;
         const static int INT_CASE = 4;
-        const static int SPECIAL_NUM = 6;
+        const static int NUMBER = 5;
+        const static int SPECIAL = 6;
 };
 
 template<typename T>
@@ -57,8 +60,6 @@ void ScalarConverter::outputInt(T val){
         std::cout << "int: " << static_cast<int>(val) << std::endl;
     }else
         std::cout << "int: impossible" << std::endl;
-
 }
-
 
 #endif

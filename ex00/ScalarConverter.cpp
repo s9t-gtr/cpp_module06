@@ -23,54 +23,62 @@ void ScalarConverter::convert(std::string input){
     }
 }
 
-ScalarConverter::ScalarConverter(){
-    std::cout << "constructor" << std::endl;
+size_t dotCount(std::string input){
+    size_t dotCnt = 0;
+    for (std::string::size_type i = 0; (i = input.find('.', i)) != std::string::npos; i++) {
+        dotCnt++;
+        if(dotCnt >= 2)
+            throw std::invalid_argument("Multiple dots");
+    }
+    return dotCnt;
 }
-ScalarConverter::~ScalarConverter(){
-    std::cout << "destructor" << std::endl;
-}
+
 int ScalarConverter::getConvertType(std::string input){
     std::string::size_type len = input.length();
     if(len == 1 && !('0' <= *input.c_str() && *input.c_str() <= '9'))
         return CHAR_CASE;
-    valueCheck(input);
-    if(input != "+inf" && input != "-inf" && input[len - 1] == 'f')
-        return FLOAT_CASE;
-    if(input.find(".") != std::string::npos || input == "+inf" || input == "-inf" || input == "nan" )
-        return DOUBLE_CASE;
+    if(isNumbers(input)){
+        if(input[len-1] == 'f' || input[len-1] == 'F')
+            return FLOAT_CASE;
+        else if(dotCount(input) == 1)
+            return DOUBLE_CASE;
+        return INT_CASE;
+    }else{
+
+        double d;
+        std::stringstream ss(input);
+        if(ss >> d)
+            return DOUBLE_CASE;
+        float f;
+        std::string s(input.begin(), --input.end());
+        ss = std::stringstream(s);
+        if(ss >> f)
+            return FLOAT_CASE;
+        throw std::invalid_argument("invelid ");
+    }
     return INT_CASE;
 }
 
-void ScalarConverter::valueCheck(std::string input){
+
+bool ScalarConverter::isNumbers(std::string input){
     std::string::size_type len = input.length();
-    size_t dotCount = 0;
-    if(!isSpecialString(input)){
-        for (std::string::size_type i = 0; (i = input.find('.', i)) != std::string::npos; i++) {
-            dotCount++;
-            if(dotCount >= 2)
-                throw std::invalid_argument("Multiple dots");
+    std::string::size_type i=0;
+    size_t dotCnt = dotCount(input);
+    if(input[0] == '-' || input[0] == '+')
+        i++;
+    for(;i<len;i++){
+        if(!std::isdigit(input[i]) && input[i] != '.'){
+            if((input[i] == 'f' || input[i] == 'F') && i == len - 1){
+                if(dotCnt == 1)
+                    return true;
+                else
+                    throw std::invalid_argument("invalid float literal");
+            }
+            else
+                return false;
         }
-        std::string::size_type i=0;
-        if(input[0] == '-' || input[0] == '+')
-            i++;
-        for(;i<len-1;i++){
-            if(!std::isdigit(input[i]) && input[i] != '.')
-                throw std::invalid_argument("Not a number or a dot");
-        }
-        if(!std::isdigit(input[i]) && input[i] != 'f' && input[i] != '.')
-            throw std::invalid_argument("Not a number or an f at the end.");
-        if(input[i] == 'f' && dotCount != 1)
-            throw std::invalid_argument("invalid float literal");
     }
-    
-}
-bool ScalarConverter::isSpecialString(std::string input){
-    std::string specialString[] = {"nan", "nanf", "+inf", "-inf", "+inff", "-inff"};
-    for(int i=0;i<SPECIAL_NUM;i++){
-        if(input == specialString[i])
-            return true;
-    }
-    return false;
+    return true;
 }
 
 void ScalarConverter::convert_char(std::string input){
@@ -81,49 +89,6 @@ void ScalarConverter::convert_char(std::string input){
     std::cout <<std::fixed<<std::setprecision(1)<<"double: " << static_cast<double>(c) << std::endl;
 }
 
-void ScalarConverter::convert_float(std::string input){
-    try{
-        double f = stod(input);
-        if(f == INFINITY || f == -INFINITY)
-            throw std::out_of_range("inf");
-        outputChar(f);
-        outputInt(f);
-        if(static_cast<float>(f) == INFINITY){
-            std::cout<< std::fixed << std::setprecision(1) <<"float: " << (input[0] == '-' ? "-inff": "+inff")<< std::endl;
-            std::cout << "double: impossible" << std::endl;
-            return;
-        }
-        std::cout << std::fixed << std::setprecision(1) << "float: " << static_cast<float>(f) << "f"<< std::endl;
-        std::cout << std::fixed << std::setprecision(1) << "double: " << (f) << std::endl;
-    }catch(std::out_of_range&){
-        std::cout << "char: impossible" << std::endl;
-        std::cout << "int: impossible" << std::endl;
-        std::cout << "float: " << (input[0] == '-' ? "-inff": "+inff") << std::endl;
-        std::cout << "double: impossible" << std::endl;
-    }
-    
-}
-void ScalarConverter::convert_double(std::string input){
-    try{
-        double d = stod(input);
-        if(d == INFINITY || d == -INFINITY)
-            throw std::out_of_range("inf");
-        outputChar(d);
-
-        outputInt(d);
-        if(static_cast<float>(d) == INFINITY)
-            std::cout<< std::fixed << std::setprecision(1) <<"float: " << (input[0] == '-' ? "-inff": "+inff")<< std::endl;
-        else{
-            std::cout<< std::fixed << std::setprecision(1) <<"float: " << static_cast<float>(d) << "f"<< std::endl;
-        }
-        std::cout<< std::fixed << std::setprecision(1)<< "double: " << d << std::endl;
-    }catch(std::out_of_range&){
-        std::cout << "char: impossible" << std::endl;
-        std::cout << "int: impossible" << std::endl;
-        std::cout << "float: " << (input[0] == '-' ? "-inff": "+inff") << std::endl;
-        std::cout << "double: " << (input[0] == '-' ? "-inf": "+inf") << std::endl;
-    }
-}
 void ScalarConverter::convert_int(std::string input){
     try{
         int i = stoi(input);
@@ -135,6 +100,36 @@ void ScalarConverter::convert_int(std::string input){
         allImpossible();
     }
 }
+
+void ScalarConverter::convert_float(std::string input){
+    input = std::string(input.begin(), --input.end());
+    float f;
+    std::stringstream ss(input);
+    ss >> f;
+        outputChar(f);
+        outputInt(static_cast<double>(f));//floatのままだとstatic_cast<float>INT_MAX(=INT_MAX+1 )との比較になってしまい都合が悪い
+    // std::cout << std::fixed << std::setprecision(1) << "inf cast to int " << static_cast<int>(f) << "f"<< std::endl;
+    std::cout << std::fixed << std::setprecision(1) << "float: " << f << "f"<< std::endl;
+    if(f == std::numeric_limits<float>::infinity() || f == -std::numeric_limits<float>::infinity())
+        std::cout<< std::fixed << std::setprecision(1) <<"double: impossible"<< std::endl;
+    else
+        std::cout << std::fixed << std::setprecision(1) << "double: " << static_cast<double>(f) << std::endl;
+}
+
+void ScalarConverter::convert_double(std::string input){
+    double d;
+    std::stringstream ss(input);
+    ss >> d;
+    outputChar(d);
+    outputInt(d);
+    if(d == std::numeric_limits<double>::infinity() || d == -std::numeric_limits<double>::infinity())
+        std::cout<< std::fixed << std::setprecision(1) <<"float: impossible"<< std::endl;
+    else 
+        std::cout<< std::fixed << std::setprecision(1) <<"float: " << static_cast<float>(d) << "f"<< std::endl;
+    std::cout<< std::fixed << std::setprecision(1)<< "double: " << d << std::endl;
+}
+
+
 
 void ScalarConverter::allImpossible(){
     std::cout << "char: impossible" << std::endl;
