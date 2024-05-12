@@ -1,5 +1,4 @@
 #include "ScalarConverter.hpp"
-#include <float.h>
 //
 
 int main(int argc, char** argv){
